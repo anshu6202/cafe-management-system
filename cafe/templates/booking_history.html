@@ -1,0 +1,172 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Bookings - Cafe Management System{% endblock %}
+
+{% block content %}
+<div class="container bookings-container">
+    <div class="page-intro">
+        <p class="eyebrow">Reservation Center</p>
+        <h1 class="page-title booking-title">My Bookings</h1>
+        <p class="section-subtitle">Track upcoming visits, review past reservations, and find details instantly.</p>
+    </div>
+
+    {% if bookings %}
+        <div class="booking-toolbar">
+            <div class="booking-filters" role="tablist" aria-label="Filter bookings">
+                <button type="button" class="booking-filter is-active" data-filter="all">All</button>
+                <button type="button" class="booking-filter" data-filter="pending">Pending</button>
+                <button type="button" class="booking-filter" data-filter="confirmed">Confirmed</button>
+                <button type="button" class="booking-filter" data-filter="completed">Completed</button>
+                <button type="button" class="booking-filter" data-filter="cancelled">Cancelled</button>
+            </div>
+            <div class="booking-search">
+                <label for="bookingSearch">Search</label>
+                <input id="bookingSearch" type="text" placeholder="Reservation number, name, email, or phone">
+            </div>
+        </div>
+
+        <div class="bookings-list">
+            {% for booking in bookings %}
+            <article
+                class="booking-item animated-card"
+                data-status="{{ booking.status }}"
+                data-search="{{ booking.id }} {{ booking.name|lower }} {{ booking.email|lower }} {% if booking.phone %}{{ booking.phone }}{% endif %}"
+            >
+                <div class="booking-header">
+                    <h3>Reservation #{{ booking.id }}</h3>
+                    <span class="status-badge status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                </div>
+
+                <div class="booking-content">
+                    <div class="booking-column booking-detail">
+                        <p class="booking-label">Date and Time</p>
+                        <p class="booking-value">{{ booking.date|date:"F j, Y" }} at {{ booking.time|time:"H:i" }}</p>
+                    </div>
+                    <div class="booking-column booking-detail">
+                        <p class="booking-label">Number of People</p>
+                        <p class="booking-value">{{ booking.number_of_people }} guests</p>
+                    </div>
+                    <div class="booking-column booking-detail">
+                        <p class="booking-label">Contact</p>
+                        <p class="booking-value">
+                            {{ booking.name }}<br>
+                            {{ booking.email }}<br>
+                            {% if booking.phone %}{{ booking.phone }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="booking-column booking-detail">
+                        <p class="booking-label">Booked On</p>
+                        <p class="booking-value">{{ booking.created_at|date:"F j, Y" }} <small>{{ booking.created_at|time:"H:i" }}</small></p>
+                    </div>
+                    <div class="booking-column booking-detail booking-detail-wide">
+                        <p class="booking-label">Special Requests</p>
+                        <p class="booking-value booking-notes">
+                            {% if booking.special_requests %}
+                                {{ booking.special_requests }}
+                            {% else %}
+                                <em>None</em>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="booking-actions">
+                    {% if booking.status == 'pending' %}
+                        <button class="btn btn-small btn-secondary" onclick="alert('Cancellation feature coming soon!')">Cancel</button>
+                    {% endif %}
+                    <a href="{% url 'home' %}" class="btn btn-small btn-outline-primary">Back to Home</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <p id="bookingNoMatch" class="booking-no-match" hidden>No bookings match your current filter or search.</p>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">No Reservations Yet</div>
+            <h3>No bookings yet</h3>
+            <p>You haven't made any table reservations yet.</p>
+            <div class="empty-actions">
+                <a href="{% url 'book_table' %}" class="btn btn-primary">Book a Table</a>
+                <a href="{% url 'menu' %}" class="btn btn-outline-primary">View Menu</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="bookings-info">
+        <div class="info-box">
+            <h4>Booking Status Guide</h4>
+            <ul>
+                <li><strong>Pending:</strong> Your booking is pending confirmation</li>
+                <li><strong>Confirmed:</strong> Your booking has been confirmed</li>
+                <li><strong>Completed:</strong> Your reservation has been completed</li>
+                <li><strong>Cancelled:</strong> Your booking has been cancelled</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h4>Need Help?</h4>
+            <p>
+                If you have any questions about your booking, please contact us:<br>
+                <strong>Phone:</strong> 6202686957<br>
+                <strong>Email:</strong> reservations@cafemate.com
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filterButtons = document.querySelectorAll(".booking-filter");
+    const searchInput = document.getElementById("bookingSearch");
+    const bookingCards = Array.from(document.querySelectorAll(".booking-item"));
+    const noMatch = document.getElementById("bookingNoMatch");
+
+    if (!bookingCards.length) {
+        return;
+    }
+
+    let activeFilter = "all";
+
+    function applyFilters() {
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+        let visibleCount = 0;
+
+        bookingCards.forEach((card) => {
+            const cardStatus = card.dataset.status || "";
+            const cardSearch = (card.dataset.search || "").toLowerCase();
+            const statusMatch = activeFilter === "all" || cardStatus === activeFilter;
+            const searchMatch = !query || cardSearch.includes(query);
+            const shouldShow = statusMatch && searchMatch;
+
+            card.style.display = shouldShow ? "" : "none";
+            if (shouldShow) {
+                visibleCount += 1;
+            }
+        });
+
+        if (noMatch) {
+            noMatch.hidden = visibleCount !== 0;
+        }
+    }
+
+    filterButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            filterButtons.forEach((item) => item.classList.remove("is-active"));
+            this.classList.add("is-active");
+            activeFilter = this.dataset.filter || "all";
+            applyFilters();
+        });
+    });
+
+    if (searchInput) {
+        searchInput.addEventListener("input", applyFilters);
+    }
+
+    applyFilters();
+});
+</script>
+{% endblock %}

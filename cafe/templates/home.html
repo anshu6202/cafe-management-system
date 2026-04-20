@@ -1,0 +1,294 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Home - CafeMate{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" id="home">
+    <div class="container">
+        <div class="hero-content" data-aos="fade-up">
+            <h1 class="hero-title">Welcome to CafeMate</h1>
+            <p class="hero-subtitle">Experience the perfect blend of exceptional coffee, delicious cuisine, and warm hospitality in our modern cafe space.</p>
+            <div class="hero-buttons">
+                <a href="#menu" class="btn btn-primary">Explore Menu</a>
+                <a href="{% url 'book_table' %}" class="btn btn-secondary">Book a Table</a>
+            </div>
+            <div class="hero-stats row mt-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center">
+                        <h3 class="text-white mb-1">50+</h3>
+                        <p class="mb-0">Signature Dishes</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-center">
+                        <h3 class="text-white mb-1">4.8/5</h3>
+                        <p class="mb-0">Customer Rating</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center">
+                        <h3 class="text-white mb-1">7 Days</h3>
+                        <p class="mb-0">Open Weekly</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Menu Section -->
+<section class="menu-section section" id="menu">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Our Menu</h2>
+            <p>Discover our carefully crafted selection of beverages, snacks, and desserts</p>
+        </div>
+
+        <!-- Menu Filters -->
+        <div class="menu-filters" data-aos="fade-up" data-aos-delay="200">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="coffee">Coffee</button>
+            <button class="filter-btn" data-filter="tea">Tea</button>
+            <button class="filter-btn" data-filter="snacks">Snacks</button>
+            <button class="filter-btn" data-filter="desserts">Desserts</button>
+            <button class="filter-btn" data-filter="beverages">Beverages</button>
+            <button class="filter-btn" data-filter="breakfast">Breakfast</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="row justify-content-center mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" id="menuSearch" class="form-control" placeholder="Search menu items..." style="border-radius: 25px 0 0 25px; border: 2px solid var(--secondary-color);">
+                    <button class="btn btn-primary" type="button" style="border-radius: 0 25px 25px 0;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="text-center mb-4" data-aos="fade-up">
+            <p class="text-muted">Showing <span id="itemCount">{{ menu_items|length }}</span> delicious items</p>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menuGrid">
+            {% for item in menu_items %}
+            <div class="menu-card" data-category="{{ item.category }}" data-name="{{ item.name|lower }}" data-aos="fade-up">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-image">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=300&q=80" alt="{{ item.name }}" class="menu-image">
+                {% endif %}
+                <div class="menu-content">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-secondary">{{ item.get_category_display }}</span>
+                        <small class="text-success"><i class="fas fa-check-circle"></i> Available</small>
+                    </div>
+                    <h3 class="menu-title">{{ item.name }}</h3>
+                    <p class="menu-description">{{ item.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="menu-price">${{ item.price }}</span>
+                        <a href="{% url 'menu_detail' item.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not menu_items %}
+            <div class="col-12 text-center">
+                <div class="empty-state" data-aos="fade-up">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h3>No items found</h3>
+                    <p>Try adjusting your search or filters</p>
+                    <a href="{% url 'menu' %}" class="btn btn-primary">View All Items</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="gallery-section section" id="gallery">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Gallery</h2>
+            <p>Take a glimpse into our cozy cafe atmosphere</p>
+        </div>
+
+        <div class="gallery-grid">
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+                <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&w=400&q=80" alt="Cafe Interior" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+                <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80" alt="Coffee Making" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="300">
+                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80" alt="Cafe Seating" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="400">
+                <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80" alt="Desserts" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="500">
+                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=400&q=80" alt="Breakfast Items" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+            <div class="gallery-item" data-aos="zoom-in" data-aos-delay="600">
+                <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&w=400&q=80" alt="Team" class="gallery-image">
+                <div class="gallery-overlay">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section section" id="testimonials">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <h2>What Our Customers Say</h2>
+            <p>Hear from our satisfied customers</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"The best coffee I've ever had! The atmosphere is perfect for working or relaxing. Highly recommend the caramel latte!"</p>
+                    <p class="testimonial-author">- Sarah Johnson</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Amazing service and delicious food. The croissants are to die for! This is my go-to spot for breakfast meetings."</p>
+                    <p class="testimonial-author">- Michael Chen</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="testimonial-card">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">"Love the cozy atmosphere and friendly staff. The desserts are incredible and the coffee is always perfectly brewed."</p>
+                    <p class="testimonial-author">- Emily Rodriguez</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center" data-aos="fade-up">
+        <h2 class="mb-3">Ready to Experience CafeMate?</h2>
+        <p class="mb-4">Book your table now and enjoy an unforgettable dining experience</p>
+        <a href="{% url 'book_table' %}" class="btn btn-light btn-lg">Book Your Table</a>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const menuCards = document.querySelectorAll('.menu-card');
+    const searchInput = document.getElementById('menuSearch');
+    const itemCount = document.getElementById('itemCount');
+
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            const filterValue = button.getAttribute('data-filter');
+            filterItems(filterValue, searchInput.value);
+        });
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        filterItems(activeFilter, searchInput.value);
+    });
+
+    function filterItems(categoryFilter, searchTerm) {
+        let visibleCount = 0;
+
+        menuCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            const name = card.getAttribute('data-name');
+
+            const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
+            const searchMatch = !searchTerm || name.includes(searchTerm.toLowerCase());
+
+            if (categoryMatch && searchMatch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        itemCount.textContent = visibleCount;
+    }
+
+    // Gallery lightbox functionality
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    galleryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const img = item.querySelector('img');
+            if (img) {
+                // Simple lightbox
+                const lightbox = document.createElement('div');
+                lightbox.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                    justify-content: center; z-index: 9999; cursor: pointer;
+                `;
+                lightbox.innerHTML = `<img src="${img.src}" style="max-width: 90%; max-height: 90%; object-fit: contain;">`;
+                lightbox.addEventListener('click', () => document.body.removeChild(lightbox));
+                document.body.appendChild(lightbox);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

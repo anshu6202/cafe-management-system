@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Menu - CafeMate{% endblock %}
+
+{% block content %}
+<!-- Menu Section -->
+<section class="menu-section section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Our Complete Menu</h2>
+            <p>Discover our carefully crafted selection of beverages, snacks, and desserts</p>
+        </div>
+
+        <!-- Menu Filters -->
+        <div class="menu-filters" data-aos="fade-up" data-aos-delay="200">
+            <button class="filter-btn active" data-filter="all">All Items</button>
+            <button class="filter-btn" data-filter="coffee">Coffee</button>
+            <button class="filter-btn" data-filter="tea">Tea</button>
+            <button class="filter-btn" data-filter="snacks">Snacks</button>
+            <button class="filter-btn" data-filter="desserts">Desserts</button>
+            <button class="filter-btn" data-filter="beverages">Beverages</button>
+            <button class="filter-btn" data-filter="breakfast">Breakfast</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="row justify-content-center mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" id="menuSearch" class="form-control" placeholder="Search menu items..." style="border-radius: 25px 0 0 25px; border: 2px solid var(--secondary-color);">
+                    <button class="btn btn-primary" type="button" style="border-radius: 0 25px 25px 0;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="text-center mb-4" data-aos="fade-up">
+            <p class="text-muted">Showing <span id="itemCount">{{ menu_items|length }}</span> delicious items</p>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menuGrid">
+            {% for item in menu_items %}
+            <div class="menu-card" data-category="{{ item.category }}" data-name="{{ item.name|lower }}" data-aos="fade-up">
+                <img src="{% if item.image %}{{ item.image.url }}{% else %}https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=300&q=80{% endif %}"
+                     alt="{{ item.name }}" class="menu-image">
+                <div class="menu-content">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-secondary">{{ item.get_category_display }}</span>
+                        {% if item.is_available %}
+                        <small class="text-success"><i class="fas fa-check-circle"></i> Available</small>
+                        {% else %}
+                        <small class="text-danger"><i class="fas fa-times-circle"></i> Unavailable</small>
+                        {% endif %}
+                    </div>
+                    <h3 class="menu-title">{{ item.name }}</h3>
+                    <p class="menu-description">{{ item.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="menu-price">${{ item.price }}</span>
+                        <a href="{% url 'menu_detail' item.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="empty-state" data-aos="fade-up">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h3>No items found</h3>
+                    <p>Try adjusting your search or filters</p>
+                    <a href="{% url 'menu' %}" class="btn btn-primary">View All Items</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const menuCards = document.querySelectorAll('.menu-card');
+    const searchInput = document.getElementById('menuSearch');
+    const itemCount = document.getElementById('itemCount');
+
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            const filterValue = button.getAttribute('data-filter');
+            filterItems(filterValue, searchInput.value);
+        });
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        filterItems(activeFilter, searchInput.value);
+    });
+
+    function filterItems(categoryFilter, searchTerm) {
+        let visibleCount = 0;
+
+        menuCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            const name = card.getAttribute('data-name');
+
+            const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
+            const searchMatch = !searchTerm || name.includes(searchTerm.toLowerCase());
+
+            if (categoryMatch && searchMatch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        itemCount.textContent = visibleCount;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Booking Confirmed - Cafe Management System{% endblock %}
+
+{% block content %}
+<div class="container success-container">
+    <div class="success-box">
+        <div class="success-icon">✓</div>
+        <h1>Booking Confirmed!</h1>
+        <p class="success-message">Your table reservation has been successfully created.</p>
+
+        <div class="booking-details">
+            <h3>Reservation Details</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">{{ booking.name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ booking.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">{{ booking.phone }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">{{ booking.date|date:"F j, Y" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">{{ booking.time|time:"H:i" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Number of People:</span>
+                    <span class="detail-value">{{ booking.number_of_people }}</span>
+                </div>
+                {% if booking.special_requests %}
+                <div class="detail-item full-width">
+                    <span class="detail-label">Special Requests:</span>
+                    <span class="detail-value">{{ booking.special_requests }}</span>
+                </div>
+                {% endif %}
+                <div class="detail-item">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value badge-pending">{{ booking.get_status_display }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation-message">
+            <p>
+                ✉️ A confirmation email has been sent to <strong>{{ booking.email }}</strong>
+            </p>
+            <p>
+                Please save your booking reference: <strong>#{{ booking.id }}</strong>
+            </p>
+        </div>
+
+        <div class="next-steps">
+            <h3>What's Next?</h3>
+            <ul>
+                <li>✓ Check your email for confirmation details</li>
+                <li>✓ Arrive 10-15 minutes before your reservation</li>
+                <li>✓ Contact us if you need to reschedule or cancel</li>
+                <li>✓ Check our menu and place a pre-order if desired</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            {% if user.is_authenticated %}
+                <a href="{% url 'booking_history' %}" class="btn btn-primary">View My Bookings</a>
+            {% endif %}
+            <a href="{% url 'menu' %}" class="btn btn-secondary">Browse Menu</a>
+            <a href="{% url 'home' %}" class="btn btn-outline-primary">Back to Home</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

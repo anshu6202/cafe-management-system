@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - Cafe Management System{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+    <div class="auth-panel">
+        <div class="auth-panel-decoration">
+            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=200&q=80" alt="Coffee Cup" class="decoration-image">
+        </div>
+        <p class="auth-kicker">CafeMate Member Access</p>
+        <h1>Good coffee starts with a great booking flow.</h1>
+        <p class="auth-panel-copy">
+            Sign in to manage reservations, check your visit history, and keep every cafe moment organized in one place.
+        </p>
+        <ul class="auth-benefits">
+            <li>View all upcoming and past reservations</li>
+            <li>Book tables in a few clicks</li>
+            <li>Get a smooth personalized cafe experience</li>
+        </ul>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=100&q=80" alt="CafeMate Logo" class="logo-image">
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Login to your CafeMate account</p>
+            </div>
+
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="form-errors">
+                            {% for error in form.username.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="form-errors">
+                            {% for error in form.password.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember_me">
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">Login</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{% url 'signup' %}">Create one here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

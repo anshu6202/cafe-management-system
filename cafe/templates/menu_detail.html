@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ menu_item.name }} - Menu{% endblock %}
+
+{% block content %}
+<div class="container menu-detail-container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{% url 'menu' %}">Menu</a> > <span>{{ menu_item.name }}</span>
+    </div>
+
+    <!-- Item Details -->
+    <div class="item-detail">
+        <div class="item-image-section">
+            {% if menu_item.image %}
+                <img src="{{ menu_item.image.url }}" alt="{{ menu_item.name }}" class="item-detail-image">
+            {% else %}
+                <img src="https://via.placeholder.com/500x400?text={{ menu_item.name }}" alt="{{ menu_item.name }}" class="item-detail-image">
+            {% endif %}
+        </div>
+
+        <div class="item-info-section">
+            <div class="item-category">{{ menu_item.get_category_display }}</div>
+            <h1 class="item-title">{{ menu_item.name }}</h1>
+            
+            <div class="item-price">
+                <span class="price-label">Price:</span>
+                <span class="price-value">${{ menu_item.price }}</span>
+            </div>
+
+            <div class="item-description">
+                <h3>Description</h3>
+                <p>{{ menu_item.description }}</p>
+            </div>
+
+            <div class="item-actions">
+                <a href="{% url 'book_table' %}" class="btn btn-primary btn-large">Book a Table to Enjoy This</a>
+                <a href="{% url 'menu' %}" class="btn btn-secondary btn-large">Back to Menu</a>
+            </div>
+
+            <div class="item-meta">
+                <p>
+                    <strong>Availability:</strong> 
+                    {% if menu_item.is_available %}
+                        <span class="badge-available">Available</span>
+                    {% else %}
+                        <span class="badge-unavailable">Currently Unavailable</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Items -->
+    {% if related_items %}
+    <section class="related-items-section">
+        <h2 class="section-title">You Might Also Like</h2>
+        <div class="items-grid">
+            {% for item in related_items %}
+            <div class="menu-card">
+                <div class="menu-image">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x200?text={{ item.name }}" alt="{{ item.name }}">
+                    {% endif %}
+                </div>
+                <div class="menu-info">
+                    <div class="menu-category">{{ item.get_category_display }}</div>
+                    <h3 class="menu-name">{{ item.name }}</h3>
+                    <p class="menu-description">{{ item.description|truncatewords:10 }}</p>
+                    <div class="menu-footer">
+                        <span class="menu-price">${{ item.price }}</span>
+                        <a href="{% url 'menu_detail' item.id %}" class="btn btn-small">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+{% endblock %}
