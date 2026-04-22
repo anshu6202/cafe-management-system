@@ -7,15 +7,25 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ON_RENDER = os.environ.get('RENDER', '').lower() == 'true'
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-abc123xyz789-development-key-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False' if ON_RENDER else 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+default_hosts = ['localhost', '127.0.0.1', '[::1]']
+render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_external_hostname:
+    default_hosts.append(render_external_hostname)
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', ','.join(default_hosts)).split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -203,6 +213,3 @@ CORS_ALLOW_CREDENTIALS = True
 # Email backend for dev purposes. In production, replace with SMTP or email service.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FROM = 'no-reply@cafemanagement.local'
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
