@@ -10,6 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ON_RENDER = os.environ.get('RENDER', '').lower() == 'true'
 
 
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).lower() in ('1', 'true', 'yes', 'on')
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-abc123xyz789-development-key-only')
 
@@ -135,6 +139,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'cafe', 'static'),
 ]
 
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -201,14 +211,38 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
+default_cors_origins = [
     "http://localhost:3000",
     "http://localhost:8000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
 ]
+if render_external_hostname:
+    default_cors_origins.append(f"https://{render_external_hostname}")
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', ','.join(default_cors_origins)).split(',')
+    if origin.strip()
+]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+if render_external_hostname:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{render_external_hostname}")
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if ON_RENDER else None
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', ON_RENDER)
+SESSION_COOKIE_SECURE = env_bool('SESSION_COOKIE_SECURE', ON_RENDER)
+CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', ON_RENDER)
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000' if ON_RENDER else '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', ON_RENDER)
+SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', ON_RENDER)
 
 # Email backend for dev purposes. In production, replace with SMTP or email service.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -7,32 +7,72 @@
 <section class="hero-section" id="home">
     <div class="container">
         <div class="hero-content" data-aos="fade-up">
-            <h1 class="hero-title">Welcome to CafeMate</h1>
-            <p class="hero-subtitle">Experience the perfect blend of exceptional coffee, delicious cuisine, and warm hospitality in our modern cafe space.</p>
+            <div class="hero-kicker">
+                <span><i class="fas fa-mug-hot"></i> Freshly brewed daily</span>
+                <span><i class="fas fa-clock"></i> 8 AM - 10 PM</span>
+            </div>
+            <h1 class="hero-title">CafeMate</h1>
+            <p class="hero-subtitle">A warm modern cafe for rich coffee, comfort food, and table bookings that feel effortless.</p>
             <div class="hero-buttons">
-                <a href="#menu" class="btn btn-primary">Explore Menu</a>
-                <a href="{% url 'book_table' %}" class="btn btn-secondary">Book a Table</a>
+                <a href="#menu" class="btn btn-primary"><i class="fas fa-utensils me-2"></i>Explore Menu</a>
+                <a href="{% url 'book_table' %}" class="btn btn-secondary"><i class="fas fa-calendar-check me-2"></i>Book a Table</a>
             </div>
             <div class="hero-stats row mt-4">
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="text-center">
+                    <div class="text-center hero-stat-card">
                         <h3 class="text-white mb-1">50+</h3>
                         <p class="mb-0">Signature Dishes</p>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="text-center">
+                    <div class="text-center hero-stat-card">
                         <h3 class="text-white mb-1">4.8/5</h3>
                         <p class="mb-0">Customer Rating</p>
                     </div>
                 </div>
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="text-center">
+                    <div class="text-center hero-stat-card">
                         <h3 class="text-white mb-1">7 Days</h3>
                         <p class="mb-0">Open Weekly</p>
                     </div>
                 </div>
             </div>
+            <div class="hero-special" data-aos="fade-up" data-aos-delay="500">
+                <i class="fas fa-star"></i>
+                <span>Today's pick: Caramel latte with butter croissant</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Section -->
+<section class="featured-section section">
+    <div class="container">
+        <div class="featured-header" data-aos="fade-up">
+            <div>
+                <span class="section-eyebrow">Customer favorites</span>
+                <h2>Popular Today</h2>
+            </div>
+            <a href="{% url 'menu' %}" class="btn btn-outline-primary">View Full Menu</a>
+        </div>
+
+        <div class="featured-grid">
+            {% for item in menu_items|slice:":3" %}
+            <a href="{% url 'menu_detail' item.id %}" class="featured-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <img src="{% if item.image %}{{ item.image.url }}{% else %}https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80{% endif %}" alt="{{ item.name }}">
+                <div class="featured-card-content">
+                    <span>{{ item.get_category_display }}</span>
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description|truncatechars:82 }}</p>
+                    <strong>${{ item.price }}</strong>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <h3>No featured items yet</h3>
+                <p>Add menu items from admin to show customer favorites here.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </section>
@@ -77,11 +117,14 @@
         <div class="menu-grid" id="menuGrid">
             {% for item in menu_items %}
             <div class="menu-card" data-category="{{ item.category }}" data-name="{{ item.name|lower }}" data-aos="fade-up">
+                <div class="menu-image-wrap">
                 {% if item.image %}
                 <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-image">
                 {% else %}
                 <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=300&q=80" alt="{{ item.name }}" class="menu-image">
                 {% endif %}
+                    <span class="menu-price-float">${{ item.price }}</span>
+                </div>
                 <div class="menu-content">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <span class="badge bg-secondary">{{ item.get_category_display }}</span>
@@ -90,8 +133,8 @@
                     <h3 class="menu-title">{{ item.name }}</h3>
                     <p class="menu-description">{{ item.description|truncatechars:100 }}</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="menu-price">${{ item.price }}</span>
-                        <a href="{% url 'menu_detail' item.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <span class="menu-rating"><i class="fas fa-star"></i> 4.8</span>
+                        <a href="{% url 'menu_detail' item.id %}" class="btn btn-sm btn-outline-primary">Details</a>
                     </div>
                 </div>
             </div>
